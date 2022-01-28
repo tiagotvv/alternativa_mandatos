@@ -72,10 +72,10 @@ elif option == 'Distribuição dos Mandatos':
         option = st.radio('Círculos Eleitorais:',
         ('2019','Fusão de pequenos círculos', '6 círculos no território nacional (4 continente + 2 ilhas)', 'Círculo Único'))
         if option != 'Círculo Único':
-            sup = st.slider('Tamanho do Círculo de Compensação', 0,30,0,5)
+            sup = st.slider('Tamanho do Círculo de Compensação', 0,20,0,5)
             if sup != 0: 
                 whatif_circulos = 'misto'
-                barreira = st.radio('Clausula de Barreira (%):', (0, 1, 2))
+                barreira = st.radio('Clausula de Barreira (%):', (0, 0.5, 1, 2))
             if option == 'Fusão de pequenos círculos':
                 whatif_distritos = 'distritos_8'
             elif option == '6 círculos no território nacional (4 continente + 2 ilhas)':
@@ -83,7 +83,7 @@ elif option == 'Distribuição dos Mandatos':
         else: 
             whatif_circulos = 'circulo unico'
             barreira = st.radio(
-            'Clausula de Barreira (%):', (0, 1, 2))
+            'Clausula de Barreira (%):', (0, 0.5, 1, 2))
         with st.expander("Detalhes"):
             st.markdown("""
             **Fusão de pequenos círculos**: unir círculos que elegem menos de 6 deputados:\n
@@ -101,11 +101,9 @@ elif option == 'Distribuição dos Mandatos':
             st.markdown("""
             **Círculo de Compensação:** Quantos mandatos cada círculo perde.\n
             5: Lisboa 3, Porto 2 \n
-            10: Lisboa 4, Porto 4, Braga 1, Setúbal 1 \n
-            15: Lisboa 6, Porto 6, Braga 1, Setúbal 1, Aveiro 1 \n
-            20: Lisboa 7, Porto 7, Braga 2, Setúbal 2, Aveiro 2 \n
-            25: Lisboa 7, Porto 7, Braga 3, Setúbal 3, Aveiro 3, Leiria 1, Faro 1 \n
-            30: Lisboa 7, Porto 7, Braga 4, Setúbal 4, Aveiro 4, Leiria 1, Faro 1, Combra 1, Santarém 1 \n
+            10: Lisboa 4, Porto 3, Braga 1, Setúbal 1, Aveiro \n
+            15: Lisboa 5, Porto 4, Braga 2, Setúbal 2, Aveiro 2 \n
+            20: Lisboa 5, Porto 4, Braga 3, Setúbal 3, Aveiro 2, Faro 1, Leiria 1, Santarém 1
             """)
             st.markdown("""
             **Cláusula de Barreira:**: Quantidade mínima de votos (%) para um partido ser \
@@ -128,16 +126,12 @@ elif option == 'Distribuição dos Mandatos':
 
 
 
-    if sup == 30:
-        total_2019['misto'] = [5,12,3,15,3,4,8,3,8,3,9,41,6,2,33,8,14,6,5,8,2,2]   # 30 suplementares
-    elif sup == 25:
-        total_2019['misto'] = [5,13,3,16,3,4,9,3,8,3,9,41,6,2,33,9,15,6,5,8,2,2]   # 25 suplementares
-    elif sup == 20:
-        total_2019['misto'] = [5,14,3,17,3,4,9,3,9,3,10,41,6,2,33,9,16,6,5,8,2,2]   # 20 suplementares
+    if  sup == 20:
+        total_2019['misto'] = [5,14,3,16,3,4,9,3,8,3,9,43,6,2,36,8,15,6,5,8,2,2]   # 20 suplementares
     elif sup == 15:
-        total_2019['misto'] = [5,15,3,18,3,4,9,3,9,3,10,42,6,2,34,9,17,6,5,8,2,2]   # 15 suplementares
+        total_2019['misto'] = [5,14,3,17,3,4,9,3,9,3,10,43,6,2,36,9,16,6,5,8,2,2]   # 15 suplementares
     elif sup == 10:
-        total_2019['misto'] = [5,16,3,18,3,4,9,3,9,3,10,44,6,2,36,9,17,6,5,8,2,2]   # 10 suplementares        
+        total_2019['misto'] = [5,15,3,18,3,4,9,3,9,3,10,44,6,2,37,9,17,6,5,8,2,2]   # 10 suplementares        
     elif sup == 5:
         total_2019['misto'] = [5,16,3,19,3,4,9,3,9,3,10,45,6,2,38,9,18,6,5,8,2,2]   # 5 suplementares
     else:
