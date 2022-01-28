@@ -72,7 +72,7 @@ elif option == 'Distribuição dos Mandatos':
         option = st.radio('Círculos Eleitorais:',
         ('2019','Fusão de pequenos círculos', '6 círculos no território nacional (4 continente + 2 ilhas)', 'Círculo Único'))
         if option != 'Círculo Único':
-            sup = st.slider('Tamanho do Círculo de Compensação', 0,20,0,5)
+            sup = st.slider('Tamanho do Círculo de Compensação', 0,30,0,5)
             if sup != 0: 
                 whatif_circulos = 'misto'
                 barreira = st.radio('Clausula de Barreira (%):', (0, 1, 2))
@@ -104,6 +104,8 @@ elif option == 'Distribuição dos Mandatos':
             10: Lisboa 4, Porto 4, Braga 1, Setúbal 1 \n
             15: Lisboa 6, Porto 6, Braga 1, Setúbal 1, Aveiro 1 \n
             20: Lisboa 7, Porto 7, Braga 2, Setúbal 2, Aveiro 2 \n
+            25: Lisboa 7, Porto 7, Braga 3, Setúbal 3, Aveiro 3, Leiria 1, Faro 1 \n
+            30: Lisboa 7, Porto 7, Braga 4, Setúbal 4, Aveiro 4, Leiria 1, Faro 1, Combra 1, Santarém 1 \n
             """)
             st.markdown("""
             **Cláusula de Barreira:**: Quantidade mínima de votos (%) para um partido ser \
