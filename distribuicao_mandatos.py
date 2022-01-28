@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 
 st.header('Métodos alternativos para atribuir mandatos nas eleições legislativas em Portugal')
-st.caption('Atualizado em 15/1/2022')
+st.caption('Atualizado em 28/1/2022')
 #DATA_URL = ('./deputados.csv')
 TOTAL_URL = ('./total_2019.csv')
 
@@ -126,9 +126,11 @@ elif option == 'Distribuição dos Mandatos':
 
 
 
-
-
-    if sup == 20:
+    if sup == 30:
+        total_2019['misto'] = [5,12,3,15,3,4,8,3,8,3,9,41,6,2,33,8,14,6,5,8,2,2]   # 30 suplementares
+    elif sup == 25:
+        total_2019['misto'] = [5,13,3,16,3,4,9,3,8,3,9,41,6,2,33,9,15,6,5,8,2,2]   # 25 suplementares
+    elif sup == 20:
         total_2019['misto'] = [5,14,3,17,3,4,9,3,9,3,10,41,6,2,33,9,16,6,5,8,2,2]   # 20 suplementares
     elif sup == 15:
         total_2019['misto'] = [5,15,3,18,3,4,9,3,9,3,10,42,6,2,34,9,17,6,5,8,2,2]   # 15 suplementares
