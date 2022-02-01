@@ -38,7 +38,7 @@ option = st.selectbox(
 if option == 'Início':
 
     st.markdown("""Eleições Legislativas: E se os mandatos fossem distribuídos de forma diferente? \
-    Nesta web app pode-se testar, com os resultados das eleições legislativas de 2019, diferentes formas \
+    Nesta web app pode-se testar, com os resultados das eleições legislativas de 2019 e 2022, diferentes formas \
     de atribuir mandatos, como círculo eleitoral único, utilização de círculo de compensação, \
     fusão de pequenos círculos entre outras. 
     """)
