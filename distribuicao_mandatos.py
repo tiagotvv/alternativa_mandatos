@@ -3,13 +3,15 @@ import pandas as pd
 import numpy as np
 
 st.header('Métodos alternativos para atribuir mandatos nas eleições legislativas em Portugal')
-st.caption('Atualizado em 28/1/2022')
+st.caption('Atualizado em 1/2/2022')
 #DATA_URL = ('./deputados.csv')
-TOTAL_URL = ('./total_2019.csv')
-
-@st.cache
-def load_data():
-    total = pd.read_csv(TOTAL_URL)
+TOTAL_URL_2022 = ('./total_2019_b.csv')
+TOTAL_URL_2019 = ('./total_2019.csv')
+def load_data(ano):
+    if ano == 2022:
+        total = pd.read_csv(TOTAL_URL_2022)
+    else:
+        total = pd.read_csv(TOTAL_URL_2019)    
     return total
 
 def dHondt(votes, seats):
@@ -23,8 +25,10 @@ def dHondt(votes, seats):
         seats = seats - 1
     return allocation-1
 
+ano = st.radio(
+            'Ano:', (2019,2022))
 data_load_state = st.text('Loading data...')
-votos = load_data()
+votos = load_data(ano)
 data_load_state.text('Loading data... done!')
 
 option = st.selectbox(
@@ -38,8 +42,8 @@ if option == 'Início':
     de atribuir mandatos, como círculo eleitoral único, utilização de círculo de compensação, \
     fusão de pequenos círculos entre outras. 
     """)
-    st.markdown("""Há também um **what-if scenario** para o PSD: o que aconteceria se o partido tivesse concorrido coligado em 2019? \
-    E se não tivesse se dividido no Aliança e Chega? Qual seria o efeito na representatividade dos resultados eleitorais? 
+    st.markdown("""Há também um **what-if scenario** para o PSD: o que aconteceria se o partido tivesse concorrido coligado? \
+    Qual seria o efeito na representatividade dos resultados eleitorais? 
     """)
     st.markdown("""
     Para avaliar a representatividade destes métodos alternativos, incluí o **índice de Loosemore–Hanby** (LHI) \
@@ -68,10 +72,12 @@ elif option == 'Distribuição dos Mandatos':
 
     flag_circulo = st.checkbox(
      'Cenários Alternativos')
+
     if flag_circulo:
         option = st.radio('Círculos Eleitorais:',
-        ('2019','Fusão de pequenos círculos', '6 círculos no território nacional (4 continente + 2 ilhas)', 'Círculo Único'))
+        ('2019/2022','Fusão de pequenos círculos', '6 círculos no território nacional (4 continente + 2 ilhas)', 'Círculo Único'))
         if option != 'Círculo Único':
+            st.write('Obs: Em 2022, para efeito de atribuição de mandatados no círculo único e no círculo de compensação, as coligações na Madeira e Açores contam para o PSD')
             sup = st.slider('Tamanho do Círculo de Compensação', 0,20,0,5)
             if sup != 0: 
                 whatif_circulos = 'misto'
@@ -80,7 +86,9 @@ elif option == 'Distribuição dos Mandatos':
                 whatif_distritos = 'distritos_8'
             elif option == '6 círculos no território nacional (4 continente + 2 ilhas)':
                 whatif_distritos = 'grandes'
-        else: 
+        else:
+            st.write('Obs: Em 2022, para efeito de atribuição de mandatados no círculo único e no círculo de compensação, as coligações na Madeira e Açores contam para o PSD')
+
             whatif_circulos = 'circulo unico'
             barreira = st.radio(
             'Clausula de Barreira (%):', (0, 0.5, 1, 2))
@@ -112,18 +120,17 @@ elif option == 'Distribuição dos Mandatos':
             """)
         
         option_direita = st.radio('Centro-Direita:',
-        ('2019','PSD 2015 = PSD+ALI+CHEGA', 'PaF 2019 = PSD+CDS-PP', 'PaF 2015 = PSD + CDS-PP + ALI + CHEGA'))
+        ('2019/2022', 'PSD e CDS coligados'))
         if option_direita == 'PSD 2015 = PSD+ALI+CHEGA':
             whatif_partidos = 'PSD2015'
+        if option_direita == 'PSD e CDS coligados':
+            whatif_partidos = 'PSD/CDS-PP'
         elif option_direita == 'PaF 2019 = PSD+CDS-PP':
             whatif_partidos = 'PaF2019'
         elif option_direita == 'PaF 2015 = PSD + CDS-PP + ALI + CHEGA':
             whatif_partidos = 'PaF2015'
         else:
             whatif_partidos = 'PSD2019'
-
-
-
 
 
     if  sup == 20:
@@ -141,7 +148,10 @@ elif option == 'Distribuição dos Mandatos':
 
 
     if whatif_partidos == 'PSD2019':
-        total_2019_s = total_2019.copy()
+        total_2019_s = total_2019.copy()  
+        if ano == 2022:
+            total_2019_s.loc[:, 'PSD'] = total_2019_s['PSD'] + total_2019_s['PSD/CDS-PP']
+            total_2019_s = total_2019_s.drop(['PSD/CDS-PP'], axis=1)
     elif whatif_partidos == 'PaF2019':
         total_2019_s = total_2019.copy()
         ilhas = total_2019_s.index.isin(['Açores','Madeira'])
@@ -166,6 +176,17 @@ elif option == 'Distribuição dos Mandatos':
         total_2019_s = total_2019.copy()
         total_2019_s.loc[:, 'PSD2015'] = total_2019_s['PSD'] + total_2019_s['Aliança']  + total_2019_s['Chega'] 
         total_2019_s = total_2019_s.drop(['Aliança','Chega','PSD'], axis=1) 
+        colunas = list(total_2019_s.columns)
+        colunas = [colunas[0]] + [colunas[-1]] + colunas[1:-1]
+        total_2019_s = total_2019_s[colunas]
+    elif whatif_partidos == 'PSD/CDS-PP':
+        total_2019_s = total_2019.copy()
+        if ano == 2022:
+            total_2019_s.loc[:, 'PSD+CDS'] = total_2019_s['PSD'] + total_2019_s['CDS-PP']  + total_2019_s['PSD/CDS-PP']
+            total_2019_s = total_2019_s.drop(['CDS-PP','PSD','PSD/CDS-PP'], axis=1)
+        else:
+            total_2019_s.loc[:, 'PSD+CDS'] = total_2019_s['PSD'] + total_2019_s['CDS-PP']
+            total_2019_s = total_2019_s.drop(['CDS-PP','PSD'], axis=1) 
         colunas = list(total_2019_s.columns)
         colunas = [colunas[0]] + [colunas[-1]] + colunas[1:-1]
         total_2019_s = total_2019_s[colunas]
@@ -293,7 +314,7 @@ elif option == 'Distribuição dos Mandatos':
     mand['Mandatos'] = total.astype(int)
     mand['Pct Mandatos'] = (100*mand['Mandatos']/230).map('{:,.2f}'.format)
     st.write('Total')
-    st.write(mand.sort_values(by='Votos',ascending=False).style.format({'Votos':'{:,.0f}'}))
+    st.write(mand.sort_values(by='Votos',ascending=False).style.hide_index().format({'Votos':'{:,.0f}'}))
 
     st.write('Loosemore–Hanby index (LHI): ', 
        round((50*(abs(0.01*mand['Pct Validos'].astype(float)-0.01*mand['Pct Mandatos'].astype(float))).sum()),2),'%')
