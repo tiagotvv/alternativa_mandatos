@@ -17,13 +17,16 @@ def load_data(ano):
 def dHondt(votes, seats):
     num_parties = len(votes)
     quotient = votes
+    new_quotients = votes
     allocation = np.ones(num_parties)
     while seats > 0:
         quotient = votes/allocation
         idx = np.argmax(quotient)
         allocation[idx] = allocation[idx]+1
         seats = seats - 1
-    return allocation-1
+        new_quotients = votes/allocation
+    return allocation-1, new_quotients
+
 
 ano = st.radio(
             'Ano:', (2019,2022))
@@ -275,21 +278,53 @@ elif option == 'Distribuição dos Mandatos':
     circulos = list(total_2019_s.index)
 
     if whatif_circulos == '2019':
+
         if ano == 2022:
+            wasted_df = pd.DataFrame()
             for circ in circulos:
-                z = dHondt(total_2019_s.loc[circ][:-6].values, total_2019_s.loc[circ]['lug_2022'])
-                total += z
-                zzz.loc[circ] = z
-        else:
-            for circ in circulos:
-                z = dHondt(total_2019_s.loc[circ][:-6].values, total_2019_s.loc[circ]['lug_2019'])
+                votos = total_2019_s.loc[circ][:-6].values
+                z,q = dHondt(votos, total_2019_s.loc[circ]['lug_2022'])
+
+                for j in range(len(z)):
+                    q_temp = q.copy()
+                    if z[j] == 0:
+                        wasted_df.loc[circ,partidos[j]] = int(votos[j])
+                    else:
+                        q_temp = np.delete(q_temp,j)
+                        needed_votes = max(np.ceil(q_temp.max()*z[j]),q_temp.max()*z[j]+1)
+                        wasted_df.loc[circ,partidos[j]] = int(votos[j] - needed_votes)
+
                 total += z
                 zzz.loc[circ] = z
             
+        else:
+            wasted_df = pd.DataFrame()
+            for circ in circulos:
+                votos = total_2019_s.loc[circ][:-6].values
+                z,q = dHondt(total_2019_s.loc[circ][:-6].values, total_2019_s.loc[circ]['lug_2019'])
+
+                for j in range(len(z)):
+                    q_temp = q.copy()
+                    if z[j] == 0:
+                        wasted_df.loc[circ,partidos[j]] = int(votos[j])
+                    else:
+                        q_temp = np.delete(q_temp,j)
+                        needed_votes = max(np.ceil(q_temp.max()*z[j]),q_temp.max()*z[j]+1)
+                        wasted_df.loc[circ,partidos[j]] = int(votos[j] - needed_votes)
+
+                total += z
+                zzz.loc[circ] = z
+        wasted_df = wasted_df.astype(int)
+        wasted_df['TOTAL'] = wasted_df.sum(axis=1)
+
+        wasted_df['VOTOS'] = total_2019_s.iloc[:,:-6].sum(axis=1)
+        wasted_df.loc['TOTAL'] = wasted_df.sum()
+        wasted_df.loc['VOTOS'] = total_2019_s.iloc[:,:-6].sum()
+        wasted_df = wasted_df.fillna(0)        
 
     elif whatif_circulos == '2015':
         for circ in circulos:
-            z = dHondt(total_2019.loc[circ][:-6].values, total_2019.loc[circ]['lug_2015'])
+            z,_= dHondt(total_2019.loc[circ][:-6].values, total_2019.loc[circ]['lug_2015'])
             zzz.loc[circ] = z
             total += z
     #elif whatif_circulos == 'circulo unico':
@@ -302,17 +337,29 @@ elif option == 'Distribuição dos Mandatos':
         soma.loc[soma/tot < barreira/100] = 0
         soma = soma[:-6]
     #   print(soma)
+        wasted_df = pd.DataFrame()
         if ano == 2022:     
-            total = dHondt(soma.values,226)
+            total,q = dHondt(soma.values,226)
         else:
-            total = dHondt(soma.values,230)
+            total,q = dHondt(soma.values,230)
+
+        for j in range(len(soma.values)):
+                    q_temp = q.copy()
+                    if total[j] == 0:
+                        wasted_df.loc[partidos[j]] = soma[j]
+                    else:
+                        q_temp = np.delete(q_temp,j)
+                        needed_votes = max(np.ceil(q_temp.max()*total[j]),q_temp.max()*total[j]+1)
+                        wasted_df.loc[partidos[j],'votos desperdicados'] = int(soma.values[j] - needed_votes)
+        
+
 
  
 
     elif whatif_circulos == 'misto':
 
         for circ in circulos:
-            z = dHondt(total_2019_s.loc[circ][:-6].values, total_2019_s.loc[circ]['misto'])
+            z,_ = dHondt(total_2019_s.loc[circ][:-6].values, total_2019_s.loc[circ]['misto'])
             zzz.loc[circ] = z
             total += z
         soma = total_2019_s.sum(axis=0)  
@@ -322,10 +369,11 @@ elif option == 'Distribuição dos Mandatos':
         #print(soma)
         p =soma.div(total+1).values
     # print(p)
-        total += dHondt(p, sup)        
-        zzz.loc['Compensação'] = dHondt(p, sup)
+        total += dHondt(p, sup)[0]        
+        zzz.loc['Compensação'],_ = dHondt(p, sup)
         #total_2019_s = total_2019_s.drop('misto', axis=1)  
-            
+    
+    
     zzz.loc['TOTAL'] = zzz.sum()
     yyy=zzz.astype(int)
     yyy = yyy.loc[:, (yyy != 0).any(axis=0)]    
@@ -344,13 +392,55 @@ elif option == 'Distribuição dos Mandatos':
     else:
         mand['Pct Mandatos'] = (100*mand['Mandatos']/230).map('{:,.2f}'.format)
 
-    st.write('Total')
+    st.subheader('Total')
     st.write(mand.sort_values(by='Votos',ascending=False).style.hide_index().format({'Votos':'{:,.0f}'}))
 
     st.write('Loosemore–Hanby index (LHI): ', 
        round((50*(abs(0.01*mand['Pct Validos'].astype(float)-0.01*mand['Pct Mandatos'].astype(float))).sum()),2),'%')
     st.write('Obs: em 2022 como os círculos do exterior ainda não foram apurados, todas \
     as percentagens e cálculos de proporcionalidade utilizam 226 mandatos como referência.')   
-    st.write('Distribuição pelos círculos eleitorais')
-    st.write(yyy)
-   
+
+    if whatif_circulos == 'circulo unico':
+        pass
+    else:
+        st.subheader('Distribuição pelos círculos eleitorais')
+        st.write(yyy)
+
+    if 'wasted_df' in locals():
+        st.subheader('Análise de Votos Desperdiçados')
+
+        if whatif_circulos == 'circulo unico':
+
+            df1 = pd.DataFrame()
+            df1 = wasted_df
+            
+            df1['aux'] = total_2019_s.sum()
+            df1['Pct do total'] = 100*df1['votos desperdicados']/df1['aux']
+
+            kapa1 = round(100*int(df1['votos desperdicados'].sum())/int(df1['aux'].sum()),1)
+            st.markdown('##### Foram desperdiçados ' + str(int(df1['votos desperdicados'].sum())) + ' ('+str(kapa1)+ '%) dos \
+            '+str(int(df1['aux'].sum()))+' votos válidos depositados')
+            st.write(df1[['votos desperdicados', 'Pct do total']].dropna().sort_values(by='Pct do total', ascending=True).style.format({'votos desperdicados':'{:,.0f}',
+                                                                                                'Pct do total':'{:,.1f}'}))
+
+        
+        else:
+
+            df1 = pd.DataFrame()
+            df1['votos desperdicados'] = wasted_df.iloc[:-2,:-2].sum(axis=1)
+            df1['Pct do total'] = (100*wasted_df['TOTAL']/wasted_df['VOTOS'])
+
+
+            kapa1 = round(100*int(df1['votos desperdicados'].sum())/int(wasted_df.loc['TOTAL','VOTOS'].sum()),1)
+            st.markdown('##### Foram desperdiçados ' + str(int(df1['votos desperdicados'].sum())) + ' ('+str(kapa1)+ '%) dos \
+            '+str(int(wasted_df.loc['TOTAL','VOTOS'].sum()))+' votos válidos depositados')
+            st.markdown('###### Por círculo eleitoral')
+            st.write(df1.dropna().sort_values(by='Pct do total', ascending=True).style.format({'votos desperdicados':'{:,.0f}',
+                                                                                                'Pct do total':'{:,.1f}'}))
+            st.markdown('###### Por partido político')
+
+            df2 = pd.DataFrame()
+            df2['votos desperdicados'] = wasted_df.iloc[:-2,:-2].sum()
+            df2['Pct do total'] = 100*wasted_df.loc['TOTAL']/wasted_df.loc['VOTOS']
+            st.write(df2.sort_values(by='votos desperdicados', ascending=False).style.format({'votos desperdicados':'{:,.0f}',
+                                                                                                        'Pct do total':'{:,.1f}'}))
