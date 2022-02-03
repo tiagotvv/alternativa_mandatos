@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 
 st.header('Métodos alternativos para atribuir mandatos nas eleições legislativas em Portugal')
-st.caption('Atualizado em 1/2/2022')
+st.caption('Atualizado em 3/2/2022')
 #DATA_URL = ('./deputados.csv')
 TOTAL_URL_2022 = ('./total_2019_b.csv')
 TOTAL_URL_2019 = ('./total_2019.csv')
