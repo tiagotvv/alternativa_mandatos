@@ -442,5 +442,5 @@ elif option == 'Distribuição dos Mandatos':
             df2 = pd.DataFrame()
             df2['votos desperdicados'] = wasted_df.iloc[:-2,:-2].sum()
             df2['Pct do total'] = 100*wasted_df.loc['TOTAL']/wasted_df.loc['VOTOS']
-            st.write(df2.sort_values(by='votos desperdicados', ascending=False).style.format({'votos desperdicados':'{:,.0f}',
+            st.write(df2.sort_values(by='Pct do total', ascending=True).style.format({'votos desperdicados':'{:,.0f}',
                                                                                                         'Pct do total':'{:,.1f}'}))
