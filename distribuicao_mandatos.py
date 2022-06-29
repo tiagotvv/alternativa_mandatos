@@ -137,30 +137,30 @@ elif option == 'Distribuição dos Mandatos':
 
 
     if  sup == 20:
-        if ano == 2022:
-            total_2019['misto'] = [5,14,3,16,3,4,9,3,8,3,9,43,6,2,36,8,15,6,5,8,0,0]   # 20 suplementares
-        else:
-            total_2019['misto'] = [5,14,3,16,3,4,9,3,8,3,9,43,6,2,36,8,15,6,5,8,2,2]   # 20 suplementares
+     #   if ano == 2022:
+     #       total_2019['misto'] = [5,14,3,16,3,4,9,3,8,3,9,43,6,2,36,8,15,6,5,8,0,0]   # 20 suplementares
+     #   else:
+        total_2019['misto'] = [5,14,3,16,3,4,9,3,8,3,9,43,6,2,36,8,15,6,5,8,2,2]   # 20 suplementares
     elif sup == 15:
-        if ano == 2022:
-            total_2019['misto'] = [5,14,3,17,3,4,9,3,9,3,10,43,6,2,36,9,16,6,5,8,0,0]   # 15 suplementares
-        else:
-            total_2019['misto'] = [5,14,3,17,3,4,9,3,9,3,10,43,6,2,36,9,16,6,5,8,2,2]   # 15 suplementares
+    #    if ano == 2022:
+    #        total_2019['misto'] = [5,14,3,17,3,4,9,3,9,3,10,43,6,2,36,9,16,6,5,8,2,0]   # 15 suplementares
+    #    else:
+        total_2019['misto'] = [5,14,3,17,3,4,9,3,9,3,10,43,6,2,36,9,16,6,5,8,2,2]   # 15 suplementares
     elif sup == 10:
-        if ano == 2022:
-            total_2019['misto'] = [5,15,3,18,3,4,9,3,9,3,10,44,6,2,37,9,17,6,5,8,0,0]   # 10 suplementares
-        else:
-            total_2019['misto'] = [5,15,3,18,3,4,9,3,9,3,10,44,6,2,37,9,17,6,5,8,2,2]   # 10 suplementares        
+    #    if ano == 2022:
+    #        total_2019['misto'] = [5,15,3,18,3,4,9,3,9,3,10,44,6,2,37,9,17,6,5,8,0,0]   # 10 suplementares
+    #    else:
+        total_2019['misto'] = [5,15,3,18,3,4,9,3,9,3,10,44,6,2,37,9,17,6,5,8,2,2]   # 10 suplementares        
     elif sup == 5:
-        if ano == 2022:
-            total_2019['misto'] = [5,16,3,19,3,4,9,3,9,3,10,45,6,2,38,9,18,6,5,8,0,0]   # 5 suplementares 
-        else:
-            total_2019['misto'] = [5,16,3,19,3,4,9,3,9,3,10,45,6,2,38,9,18,6,5,8,2,2]   # 5 suplementares
+    #    if ano == 2022:
+    #        total_2019['misto'] = [5,16,3,19,3,4,9,3,9,3,10,45,6,2,38,9,18,6,5,8,0,0]   # 5 suplementares 
+    #    else:
+        total_2019['misto'] = [5,16,3,19,3,4,9,3,9,3,10,45,6,2,38,9,18,6,5,8,2,2]   # 5 suplementares
     else:
-        if ano == 2022:
-            total_2019['misto'] = [5,16,3,19,3,4,9,3,9,3,10,48,6,2,40,9,18,6,5,8,0,0]   # 0 suplementares
-        else:
-            total_2019['misto'] = [5,16,3,19,3,4,9,3,9,3,10,48,6,2,40,9,18,6,5,8,2,2]   # 0 suplementares
+    #    if ano == 2022:
+    #        total_2019['misto'] = [5,16,3,19,3,4,9,3,9,3,10,48,6,2,40,9,18,6,5,8,0,0]   # 0 suplementares
+    #    else:
+        total_2019['misto'] = [5,16,3,19,3,4,9,3,9,3,10,48,6,2,40,9,18,6,5,8,2,2]   # 0 suplementares
 
 
 
@@ -339,7 +339,7 @@ elif option == 'Distribuição dos Mandatos':
     #   print(soma)
         wasted_df = pd.DataFrame()
         if ano == 2022:     
-            total,q = dHondt(soma.values,226)
+            total,q = dHondt(soma.values,230)
         else:
             total,q = dHondt(soma.values,230)
 
@@ -388,7 +388,7 @@ elif option == 'Distribuição dos Mandatos':
     mand['Pct Validos'] = (100*mand['Votos']/mand['Votos'].sum()).map('{:,.2f}'.format)
     mand['Mandatos'] = total.astype(int)
     if ano == 2022:
-        mand['Pct Mandatos'] = (100*mand['Mandatos']/226).map('{:,.2f}'.format)
+        mand['Pct Mandatos'] = (100*mand['Mandatos']/230).map('{:,.2f}'.format)
     else:
         mand['Pct Mandatos'] = (100*mand['Mandatos']/230).map('{:,.2f}'.format)
 
@@ -397,8 +397,8 @@ elif option == 'Distribuição dos Mandatos':
 
     st.write('Loosemore–Hanby index (LHI): ', 
        round((50*(abs(0.01*mand['Pct Validos'].astype(float)-0.01*mand['Pct Mandatos'].astype(float))).sum()),2),'%')
-    st.write('Obs: em 2022 como os círculos do exterior ainda não foram apurados, todas \
-    as percentagens e cálculos de proporcionalidade utilizam 226 mandatos como referência.')   
+    #st.write('Obs: em 2022 como os círculos do exterior ainda não foram apurados, todas \
+    #as percentagens e cálculos de proporcionalidade utilizam 226 mandatos como referência.')   
 
     if whatif_circulos == 'circulo unico':
         pass
