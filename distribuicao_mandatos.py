@@ -393,7 +393,7 @@ elif option == 'Distribuição dos Mandatos':
         mand['Pct Mandatos'] = (100*mand['Mandatos']/230).map('{:,.2f}'.format)
 
     st.subheader('Total')
-    st.write(mand.sort_values(by='Votos',ascending=False).style.hide_index().format({'Votos':'{:,.0f}'}))
+    st.write(mand.sort_values(by='Votos',ascending=False).style.hide(axis='index').format({'Votos':'{:,.0f}'}))
 
     st.write('Loosemore–Hanby index (LHI): ', 
        round((50*(abs(0.01*mand['Pct Validos'].astype(float)-0.01*mand['Pct Mandatos'].astype(float))).sum()),2),'%')
